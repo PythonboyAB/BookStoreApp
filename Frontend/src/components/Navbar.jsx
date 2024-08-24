@@ -1,7 +1,33 @@
 import React, { useEffect, useState } from "react";
 import { Login } from "./Login";
+import { useAuth } from "../context/AuthProvider";
+import { Logout } from "./Logout";
 
 export const Navbar = () => {
+  const[authUser, setAuthUser]=useAuth()
+  const [fullName, setFullName]=useState("")
+  {/* Retriving user name from local storage */}
+  useEffect(()=>{
+    
+  // Retrieve the JSON string from local storage
+const userString = localStorage.getItem('Users');
+
+if (userString) {
+  // Parse the JSON string into an object
+  const user = JSON.parse(userString);
+  
+  // Access the fullname property
+  const userfullname = user.fullname;
+  
+  setFullName(userfullname); 
+} else {
+  console.log("No user data found in local storage.");
+}
+  }
+  ,[])
+
+
+
   const navItems = (
     <>
       {" "}
@@ -52,7 +78,7 @@ export const Navbar = () => {
   return (
     <>
       <div className= {`max-w-screen-2xl container mx-auto md:px-20 px-4 fixed top-0 left-0 right-0  z-50  dark:bg-slate-900 dark:text-white${
-        sticky? "sticky-navbar shadow-md bg-base-200 duration-300 transition-all ease-in-out dark:bg-slate-800":""
+        sticky? "sticky-navbar shadow-md bg-base-200 duration-300 transition-all ease-in-out dark:bg-slate-700":""
       }`}>
         <div className="navbar">
           <div className="navbar-start">
@@ -84,15 +110,17 @@ export const Navbar = () => {
                 {navItems}
               </ul>
             </div>
-            <a className="text-2xl font-bold cursor-pointer">Book Store</a>
+            <a href="/" className="text-2xl font-bold cursor-pointer">Book Store</a>
           </div>
           <div className="navbar-end space-x-3">
             <div className="navbar-center hidden lg:flex">
               <ul className="menu menu-horizontal px-1">{navItems}</ul>
             </div>
             <div className="hidden md:block">
-              <label className="px-3 py-2 border rounded-md flex items-center gap-2">
-                <input type="text" className="grow outline-none dark:bg-slate-900 " placeholder="Search" />
+              <label className="px-3 py-2 border rounded-md flex items-center gap-2 ">
+                <input type="text" className={`grow outline-none dark:bg-slate-900 ${
+        sticky? "duration-300 transition-all ease-in-out dark:bg-slate-700":""
+      }`}  placeholder="Search" />
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 16 16"
@@ -136,7 +164,9 @@ export const Navbar = () => {
                 <path d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Zm-9.5,6.69A8.14,8.14,0,0,1,7.08,5.22v.27A10.15,10.15,0,0,0,17.22,15.63a9.79,9.79,0,0,0,2.1-.22A8.11,8.11,0,0,1,12.14,19.73Z" />
               </svg>
             </label>
-            <div>
+            {
+              authUser?<Logout/>: 
+              <div>
               <a className="px-3 py-2 bg-black text-white p-2 rounded-md hover:bg-slate-800 duration-300 cursor-pointer dark:bg-pink-500 dark:hover:bg-pink-400"
               onClick={()=>(document.getElementById("my_modal_3").showModal())}
               >
@@ -144,8 +174,18 @@ export const Navbar = () => {
               </a>
               <Login/>
             </div>
+            }
+           
+
           </div>
+          {
+            authUser?<div className="ml-6">
+            
+            <p>{fullName}</p>
+          </div>:""
+          }
         </div>
+        
       </div>
     </>
   );
